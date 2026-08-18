@@ -1,220 +1,580 @@
-# SkillGraph — Interactive Career & Skill Relationship Explorer
+# 🚀 SkillGraph — Interactive Career & Skill Relationship Explorer
 
-A full-stack app that models careers, skills, and their prerequisite relationships as a
-graph in **CognoDB** (openCypher over Bolt, accessed via the official Neo4j Python driver),
-lets a user select their existing skills, pick a target career, and see exactly which
-skills are missing — plus learning resources and multi-hop learning paths between skills.
+<p align="center">
+  <strong>Turn skills into career paths.</strong><br/>
+  Explore careers, discover skill gaps, and navigate prerequisite relationships through a graph-powered experience.
+</p>
 
----
-
-## 1. Stack
-
-| Layer      | Technology                                                   |
-|------------|---------------------------------------------------------------|
-| Frontend   | React + Vite + Tailwind CSS                                   |
-| Backend    | Python + FastAPI                                               |
-| Database   | CognoDB (openCypher / Bolt)                                    |
-| DB Driver  | Official `neo4j` Python driver                                 |
-| Deployment | Vercel (frontend), Render/Railway (backend)                    |
-
----
-
-## 2. Graph model
-
-**Nodes:** `User`, `Skill`, `Career`, `Resource`
-
-**Relationships:**
-```
-User    -[:HAS_SKILL]->        Skill
-Career  -[:REQUIRES]->         Skill
-Skill   -[:RELATED_TO]->       Skill
-Skill   -[:PREREQUISITE_FOR]-> Skill
-Resource-[:TEACHES]->          Skill
-```
-
-```
-                       ┌────────────┐
-                       │   Career   │
-                       └─────┬──────┘
-                             │ REQUIRES
-                             ▼
-   ┌──────────┐   PREREQUISITE_FOR   ┌──────────┐   PREREQUISITE_FOR   ┌────────────┐
-   │  Skill A │ ───────────────────► │  Skill B │ ───────────────────► │  Skill C   │
-   └────┬─────┘                      └────┬─────┘                     └─────┬──────┘
-        │ RELATED_TO                      │ TEACHES (from Resource)         │
-        ▼                                  ▲                                 ▲
-   ┌──────────┐                      ┌──────────┐                     ┌────────────┐
-   │  Skill D │                      │ Resource │                     │  Resource  │
-   └──────────┘                      └──────────┘                     └────────────┘
-
-           ┌──────────┐  HAS_SKILL
-           │   User   │ ───────────► Skill
-           └──────────┘
-```
-
-Real example chain seeded in the graph:
-`Python → Machine Learning → Deep Learning → NLP → LLM Applications`
-
-**Why each node/relationship exists:**
-- `Career -[:REQUIRES]-> Skill`: the backbone of gap analysis — what a role needs.
-- `Skill -[:PREREQUISITE_FOR]-> Skill`: directed ordering, powers multi-hop learning paths.
-- `Skill -[:RELATED_TO]-> Skill`: lateral association (adjacent but not required-before).
-- `Resource -[:TEACHES]-> Skill`: lets missing skills surface actionable learning material.
-- `User -[:HAS_SKILL]-> Skill`: modeled but the current UI passes known-skill IDs directly
-  in the gap-analysis request rather than persisting a logged-in user's selections —
-  see "Known simplifications" below.
+<p align="center">
+  <a href="https://skillgraph-self.vercel.app/">
+    <img src="https://img.shields.io/badge/🌐_Live_Demo-Vercel-000000?style=for-the-badge" alt="Live Demo"/>
+  </a>
+  <a href="https://skillgraph-0izb.onrender.com/docs">
+    <img src="https://img.shields.io/badge/⚡_API-Swagger-009688?style=for-the-badge" alt="API Docs"/>
+  </a>
+  <img src="https://img.shields.io/badge/Frontend-React%20%2B%20Vite-61DAFB?style=for-the-badge&logo=react&logoColor=white" alt="Frontend"/>
+  <img src="https://img.shields.io/badge/Backend-FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="Backend"/>
+  <img src="https://img.shields.io/badge/Database-CognoDB-FF6B35?style=for-the-badge" alt="Database"/>
+</p>
 
 ---
 
-## 3. Repository layout
+## 🔗 Live Application
 
+| Service | URL |
+|---|---|
+| 🌐 **Frontend** | https://skillgraph-self.vercel.app/ |
+| ⚡ **Backend API** | https://skillgraph-0izb.onrender.com |
+| 📚 **Swagger / OpenAPI** | https://skillgraph-0izb.onrender.com/docs |
+| ❤️ **Health Check** | https://skillgraph-0izb.onrender.com/api/health |
+
+> **Tip:** Open the Swagger URL to explore and execute the API endpoints interactively.
+
+---
+
+## ✨ What is SkillGraph?
+
+SkillGraph is a full-stack career exploration application that represents **careers, skills, resources, and their relationships as a graph** in **CognoDB**.
+
+Instead of treating career requirements as isolated lists, SkillGraph models the connections between skills so that useful graph traversals can answer questions such as:
+
+- What skills does a career require?
+- Which skills am I missing for a target role?
+- Which skills are prerequisites for another skill?
+- What is the shortest prerequisite learning path between two skills?
+- Which other careers share skills with my target career?
+- Which learning resources can help with a missing skill?
+
+The graph is accessed through **openCypher over Bolt** using the official **Neo4j Python driver**.
+
+---
+
+## 🧭 Core User Flow
+
+```text
+                    ┌───────────────────┐
+                    │   Choose Career   │
+                    └─────────┬─────────┘
+                              │
+                              ▼
+                    ┌───────────────────┐
+                    │ Explore Required  │
+                    │      Skills       │
+                    └─────────┬─────────┘
+                              │
+                ┌─────────────┴─────────────┐
+                ▼                           ▼
+      ┌───────────────────┐       ┌───────────────────┐
+      │ Select Your Skills│       │ Explore Skill Graph│
+      └─────────┬─────────┘       └─────────┬─────────┘
+                │                           │
+                ▼                           ▼
+      ┌───────────────────┐       ┌───────────────────┐
+      │   Skill Gap       │       │ Prerequisites &   │
+      │    Analysis       │       │ Related Skills    │
+      └─────────┬─────────┘       └─────────┬─────────┘
+                │                           │
+                ▼                           ▼
+      ┌───────────────────┐       ┌───────────────────┐
+      │ Missing Skills +  │       │ Learning Paths +  │
+      │ Resources         │       │ Related Careers   │
+      └───────────────────┘       └───────────────────┘
 ```
+
+---
+
+## 🧩 Tech Stack
+
+| Layer | Technology |
+|---|---|
+| 🎨 Frontend | React + Vite + Tailwind CSS |
+| ⚙️ Backend | Python + FastAPI |
+| 🗄️ Database | CognoDB (openCypher / Bolt) |
+| 🔌 DB Driver | Official `neo4j` Python driver |
+| ✅ Validation | Pydantic |
+| 🚀 Frontend Deployment | Vercel |
+| ☁️ Backend Deployment | Render |
+
+---
+
+## 🕸️ Graph Model
+
+### Nodes
+
+```text
+User
+Skill
+Career
+Resource
+```
+
+### Relationships
+
+```text
+User     -[:HAS_SKILL]->         Skill
+Career   -[:REQUIRES]->          Skill
+Skill    -[:RELATED_TO]->        Skill
+Skill    -[:PREREQUISITE_FOR]->  Skill
+Resource -[:TEACHES]->           Skill
+```
+
+### Conceptual Graph
+
+```text
+                         ┌────────────┐
+                         │   Career   │
+                         └─────┬──────┘
+                               │ REQUIRES
+                               ▼
+        ┌──────────┐    ┌──────────┐    ┌──────────┐
+        │  Skill A │───▶│  Skill B │───▶│  Skill C │
+        └────┬─────┘    └────┬─────┘    └────┬─────┘
+             │ RELATED_TO      │                │
+             ▼                 ▼                ▼
+        ┌──────────┐     ┌──────────┐     ┌──────────┐
+        │  Skill D │     │ Resource │     │ Resource │
+        └──────────┘     └──────────┘     └──────────┘
+                              │
+                              │ TEACHES
+                              ▼
+                            Skill
+
+        ┌──────────┐
+        │   User   │
+        └────┬─────┘
+             │ HAS_SKILL
+             ▼
+           Skill
+```
+
+### Example prerequisite chain
+
+```text
+Python
+  ↓
+Machine Learning
+  ↓
+Deep Learning
+  ↓
+NLP
+  ↓
+LLM Applications
+```
+
+This seeded chain demonstrates how SkillGraph can represent multi-hop learning dependencies. 
+
+---
+
+## 💡 Why a Graph Database?
+
+Many of SkillGraph's most useful features are relationship-heavy.
+
+For example, finding the skills required by a career is naturally represented as:
+
+```cypher
+MATCH (c:Career {id: $career_id})-[:REQUIRES]->(s:Skill)
+WHERE NOT s.id IN $known_skill_ids
+RETURN s.id AS id, s.name AS name, s.category AS category
+```
+
+And a multi-hop prerequisite path can be expressed as:
+
+```cypher
+MATCH (from:Skill {id: $from_id}), (to:Skill {id: $to_id})
+MATCH path = shortestPath(
+  (from)-[:PREREQUISITE_FOR*1..6]->(to)
+)
+RETURN
+  [n IN nodes(path) | {id: n.id, name: n.name}] AS path_nodes,
+  length(path) AS hop_count
+```
+
+This keeps the core domain logic focused on **relationships and traversals** rather than forcing everything into relational joins.
+
+---
+
+## 🛠️ Key Features
+
+### 🎯 Career Explorer
+Browse the available career roles and inspect the skills each career requires.
+
+### 🧠 Skill Explorer
+Explore individual skills together with their related and prerequisite neighbors.
+
+### 📊 Skill Gap Analysis
+Provide the skills you already know and a target career to identify:
+
+```text
+Your Skills
+    +
+Target Career
+    ↓
+Required Skills
+    ↓
+Set Difference
+    ↓
+Missing Skills
+    ↓
+Learning Resources
+```
+
+### 🧭 Learning Paths
+Find a multi-hop prerequisite path between two skills.
+
+Example:
+
+```text
+Python
+  → Machine Learning
+  → Deep Learning
+  → NLP
+  → LLM Applications
+```
+
+### 🔗 Related Careers
+Discover other careers that overlap with a selected career through shared required skills.
+
+### ❤️ Health Monitoring
+The frontend can poll `/api/health` and display the current API/database availability state.
+
+---
+
+## 📡 API Reference
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| `GET` | `/api/health` | API + database health |
+| `GET` | `/api/careers` | List all careers |
+| `GET` | `/api/careers/{id}` | Career + required skills |
+| `GET` | `/api/skills` | List all skills |
+| `GET` | `/api/skills/{id}` | Skill + related/prerequisite neighbors |
+| `POST` | `/api/skill-gap` | Calculate missing skills + resources |
+| `GET` | `/api/learning-path` | Find prerequisite learning path |
+
+All request bodies and parameters are validated with **Pydantic**, and Cypher values are passed using parameters such as `$career_id` rather than string concatenation.
+
+---
+
+## 🗂️ Repository Structure
+
+```text
 skillgraph/
 ├── backend/
 │   ├── app/
-│   │   ├── main.py          # FastAPI app, CORS, startup/shutdown, /api/health
-│   │   ├── config.py        # env var loading (pydantic-settings)
-│   │   ├── db.py            # Neo4j driver lifecycle + get_session() dependency
-│   │   ├── routers/         # HTTP layer only (careers, skills, analysis)
-│   │   ├── services/        # orchestration between routers and queries
-│   │   ├── queries/         # every Cypher statement in the project lives here
-│   │   └── schemas/         # Pydantic request/response models
-│   ├── scripts/seed.py      # idempotent MERGE-based seed script
+│   │   ├── main.py
+│   │   ├── config.py
+│   │   ├── db.py
+│   │   ├── routers/
+│   │   ├── services/
+│   │   ├── queries/
+│   │   └── schemas/
+│   ├── scripts/
+│   │   └── seed.py
 │   ├── requirements.txt
-│   ├── render.yaml          # Render deployment blueprint
+│   ├── render.yaml
 │   └── .env.example
+│
 └── frontend/
     ├── src/
-    │   ├── api/client.js    # single fetch wrapper for the backend
-    │   ├── pages/           # CareerExplorer, SkillExplorer, GapAnalysis
-    │   └── components/      # NavBar, SkillChip, LoadingState, EmptyState, ErrorState
+    │   ├── api/
+    │   │   └── client.js
+    │   ├── pages/
+    │   │   ├── CareerExplorer
+    │   │   ├── SkillExplorer
+    │   │   └── GapAnalysis
+    │   └── components/
+    │       ├── NavBar
+    │       ├── SkillChip
+    │       ├── LoadingState
+    │       ├── EmptyState
+    │       └── ErrorState
     ├── vercel.json
     └── .env.example
 ```
 
 ---
 
-## 4. Setup & run locally
+## 💻 Run Locally
 
-### Backend
+### 1. Clone the repository
+
+```bash
+git clone <your-repository-url>
+cd skillgraph
+```
+
+### 2. Backend
 
 ```bash
 cd backend
+
 python -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\activate
-pip install -r requirements.txt
-
-cp .env.example .env
-# edit .env with your real CognoDB URI / user / password
-
-python scripts/seed.py          # loads careers, skills, resources, relationships
-
-uvicorn app.main:app --reload   # http://localhost:8000
 ```
 
-Open `http://localhost:8000/docs` for interactive Swagger UI, and check
-`http://localhost:8000/api/health` to confirm the database connection.
+**Windows**
 
-### Frontend
+```bash
+venv\Scripts\activate
+```
+
+**macOS / Linux**
+
+```bash
+source venv/bin/activate
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Create your environment file:
+
+```bash
+cp .env.example .env
+```
+
+Then configure your real CognoDB connection values.
+
+Seed the graph:
+
+```bash
+python scripts/seed.py
+```
+
+Start FastAPI:
+
+```bash
+uvicorn app.main:app --reload
+```
+
+Backend:
+
+```text
+http://localhost:8000
+```
+
+Swagger:
+
+```text
+http://localhost:8000/docs
+```
+
+Health check:
+
+```text
+http://localhost:8000/api/health
+```
+
+### 3. Frontend
 
 ```bash
 cd frontend
 npm install
-cp .env.example .env            # VITE_API_BASE_URL=http://localhost:8000
-npm run dev                     # http://localhost:5173
+```
+
+Create the frontend environment file and point it to the local backend:
+
+```env
+VITE_API_BASE_URL=http://localhost:8000
+```
+
+Start Vite:
+
+```bash
+npm run dev
+```
+
+Frontend:
+
+```text
+http://localhost:5173
 ```
 
 ---
 
-## 5. API reference
+## ☁️ Production Deployment
 
-| Method | Path                  | Purpose                                              |
-|--------|-----------------------|-------------------------------------------------------|
-| GET    | `/api/health`         | Reports API + database connectivity                   |
-| GET    | `/api/careers`        | List all careers                                       |
-| GET    | `/api/careers/{id}`   | One career + its required skills                       |
-| GET    | `/api/skills`         | List all skills                                         |
-| GET    | `/api/skills/{id}`    | One skill + its RELATED_TO / PREREQUISITE_FOR neighbors |
-| POST   | `/api/skill-gap`      | Given known skills + target career → missing skills + resources |
-| GET    | `/api/learning-path`  | Multi-hop shortest prerequisite path between two skills |
+### Frontend — Vercel
 
-All bodies/params are validated with Pydantic; every Cypher query behind these
-endpoints uses parameters (`$param`), never string concatenation.
+The frontend is deployed at:
 
----
+**https://skillgraph-self.vercel.app/**
 
-## 6. Notable queries
+Set the Vercel environment variable:
 
-**Skill-gap analysis (`analysis_queries.find_missing_skills`)** — a set-difference:
-skills a career `REQUIRES` minus the skills the user already has.
-```cypher
-MATCH (c:Career {id: $career_id})-[:REQUIRES]->(s:Skill)
-WHERE NOT s.id IN $known_skill_ids
-RETURN s.id AS id, s.name AS name, s.category AS category
-```
-In a relational schema this needs a `Career_Skill` junction table joined against a
-`User_Skill` junction table with a `NOT IN` subquery. Here it's one pattern + one filter.
-
-**Multi-hop learning path (`analysis_queries.find_learning_path`)** — variable-length
-traversal along `PREREQUISITE_FOR` edges (2+ hops), e.g. Python → ML → Deep Learning → NLP:
-```cypher
-MATCH (from:Skill {id: $from_id}), (to:Skill {id: $to_id})
-MATCH path = shortestPath((from)-[:PREREQUISITE_FOR*1..6]->(to))
-RETURN [n IN nodes(path) | {id: n.id, name: n.name}] AS path_nodes, length(path) AS hop_count
-```
-The equivalent in SQL needs a recursive CTE with manual cycle detection. Note: the `*1..6`
-hop bound is a hardcoded constant in our own code (Neo4j doesn't support parameterizing
-variable-length pattern bounds) — `from_id`/`to_id`, the actual user-supplied values,
-remain fully parameterized.
-
-**Related careers by shared skills (`career_queries.get_related_careers`)** — another
-graph-native query that's awkward relationally (self-join through a junction table +
-`GROUP BY`/`HAVING`):
-```cypher
-MATCH (c1:Career {id: $career_id})-[:REQUIRES]->(s:Skill)<-[:REQUIRES]-(c2:Career)
-WHERE c2.id <> c1.id
-RETURN c2.id AS id, c2.title AS title, count(s) AS shared_skill_count
-ORDER BY shared_skill_count DESC
+```env
+VITE_API_BASE_URL=https://skillgraph-0izb.onrender.com
 ```
 
+Then redeploy the frontend so the Vite build picks up the updated value.
+
+### Backend — Render
+
+The backend is deployed at:
+
+**https://skillgraph-0izb.onrender.com**
+
+Configure the production database and CORS environment variables on Render.
+
+Example:
+
+```env
+NEO4J_URI=<production-cognodb-uri>
+NEO4J_USER=<production-user>
+NEO4J_PASSWORD=<production-password>
+NEO4J_DATABASE=<production-database>
+ALLOWED_ORIGIN=https://skillgraph-self.vercel.app
+```
+
+> For temporary testing with local development, the allowed-origin configuration can include the local frontend origin as well.
+
+Before first production use, seed the production graph:
+
+```bash
+python scripts/seed.py
+```
+
+Then verify:
+
+```text
+https://skillgraph-0izb.onrender.com/api/health
+https://skillgraph-0izb.onrender.com/api/careers
+https://skillgraph-0izb.onrender.com/api/skills
+```
+
 ---
 
-## 7. Graceful failure handling
+## 🛡️ Reliability & Failure Handling
 
-- The driver is created once at startup (`app/db.py`); `verify_connectivity()` is checked
-  at boot and logged, but a failed check does **not** crash the process.
-- Every router wraps its query calls in `try/except (ServiceUnavailable, Neo4jError)` and
-  returns `503 { "detail": "Database is currently unavailable" }` instead of a raw 500.
-- `/api/health` exposes live DB status so the frontend nav bar can show a
-  connected/degraded indicator, polled every 15s.
-- Verified manually: booting the API against an unreachable database still starts the
-  server; `/api/health` returns `"degraded"`; `/api/careers` returns a clean `503`.
+SkillGraph is designed to fail cleanly when the database is unavailable.
+
+- The Neo4j/CognoDB driver is created once during application startup.
+- `verify_connectivity()` is checked during boot, but a failed check does not crash the API process.
+- Database-specific router failures are caught and returned as a clean `503`.
+- `/api/health` exposes live database status.
+- The frontend can surface a connected/degraded state instead of showing an unexplained application failure.
+
+Example degraded response behavior:
+
+```text
+Database unavailable
+        ↓
+FastAPI still starts
+        ↓
+/api/health → degraded
+/api/careers → 503
+        ↓
+Frontend displays an actionable error state
+```
 
 ---
 
-## 8. Deployment
+## 🔐 Security & Design Notes
 
-**Frontend → Vercel:** import the `frontend/` folder as a Vite project (see `vercel.json`),
-set `VITE_API_BASE_URL` to the deployed backend URL.
-
-**Backend → Render/Railway:** deploy the `backend/` folder (see `render.yaml` for Render),
-set `NEO4J_URI`, `NEO4J_USER`, `NEO4J_PASSWORD`, `NEO4J_DATABASE`, and `ALLOWED_ORIGINS`
-(the deployed frontend's URL) as environment variables. Run `python scripts/seed.py` once
-against the production database before first use.
+- Cypher inputs are parameterized using `$param` values.
+- Variable-length prerequisite bounds are fixed at `1..6`; user-controlled IDs remain parameterized.
+- The graph is currently **read-oriented** from the UI perspective.
+- The current gap-analysis experience passes selected skill IDs directly in the request rather than persisting them to a logged-in `User` node.
 
 ---
 
-## 9. Known simplifications
+## ⚠️ Known Simplifications
 
-- No authentication layer — the `User` node and `HAS_SKILL` relationship are modeled in
-  the schema, but the UI currently sends a user's selected skill IDs directly in the
-  gap-analysis request rather than persisting them against a logged-in `User` node. This
-  was a deliberate scope cut for a 48-hour assignment; wiring `HAS_SKILL` up would mean
-  adding a login flow and a `POST /api/users/{id}/skills` endpoint using the same
-  parameterized-Cypher pattern already used everywhere else.
-- The `*1..6` hop bound in the learning-path query is a fixed constant, not user input —
-  called out explicitly in code comments so it's clear this isn't a string-concatenation
-  injection risk, just a Cypher language limitation (variable-length pattern bounds can't
-  be parameterized).
-- No caching layer — every request hits CognoDB directly. Fine at this data scale;
-  worth mentioning as a next step for production traffic.
+This version intentionally keeps the scope focused on graph traversal and career/skill exploration.
+
+### No authentication yet
+
+The `User` node and `HAS_SKILL` relationship exist in the graph model, but the UI currently does not persist a logged-in user's skills.
+
+A future implementation could introduce:
+
+```text
+Login
+  ↓
+User profile
+  ↓
+Persist HAS_SKILL relationships
+  ↓
+Personalized skill graph
+  ↓
+Persistent career progress
+```
+
+### No caching layer
+
+Requests currently reach CognoDB directly. This is suitable for the current data scale, while a production-scale implementation could add caching, background processing, or read optimization.
+
+---
+
+## 🧪 Useful API Test Commands
+
+Health:
+
+```bash
+curl https://skillgraph-0izb.onrender.com/api/health
+```
+
+Careers:
+
+```bash
+curl https://skillgraph-0izb.onrender.com/api/careers
+```
+
+Skills:
+
+```bash
+curl https://skillgraph-0izb.onrender.com/api/skills
+```
+
+Interactive API documentation:
+
+👉 https://skillgraph-0izb.onrender.com/docs
+
+---
+
+## 🗺️ Future Roadmap
+
+```text
+✅ Career exploration
+✅ Skill exploration
+✅ Skill-gap analysis
+✅ Prerequisite learning paths
+✅ Related-career traversal
+✅ Learning resources
+✅ Production deployment
+
+🔲 Authentication
+🔲 Persistent user skill profiles
+🔲 User-specific career recommendations
+🔲 Visual graph canvas
+🔲 Progress tracking
+🔲 Skill mastery levels
+🔲 Personalized learning plans
+🔲 Caching / performance layer
+```
+
+---
+
+## 🎓 Project Focus
+
+SkillGraph demonstrates how a graph database can model a domain where **relationships are the product**, not just supporting data.
+
+The central idea is simple:
+
+> **A career is not just a list of skills — it is a connected dependency graph.**
+
+That graph makes skill gaps, prerequisites, learning paths, and related careers natural traversal problems.
+
+---
+
+<p align="center">
+  Built with React, FastAPI, CognoDB, openCypher, and a graph-first approach.
+</p>
+
+<p align="center">
+  <a href="https://skillgraph-self.vercel.app/">🌐 Open SkillGraph</a>
+  ·
+  <a href="https://skillgraph-0izb.onrender.com/docs">📚 Explore API</a>
+</p>
