@@ -24,8 +24,5 @@ class Settings(BaseSettings):
 
 @lru_cache
 def get_settings() -> Settings:
-    """
-    Cached so the .env file is parsed once per process, and every
-    module that needs config gets the same Settings instance.
-    """
+
     return Settings()
