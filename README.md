@@ -143,7 +143,7 @@ endpoints uses parameters (`$param`), never string concatenation.
 
 ---
 
-## 6. Notable queries (interview talking points)
+## 6. Notable queries
 
 **Skill-gap analysis (`analysis_queries.find_missing_skills`)** — a set-difference:
 skills a career `REQUIRES` minus the skills the user already has.
