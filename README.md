@@ -423,6 +423,16 @@ http://localhost:5173
 
 ---
 
+## 🎥 Project Demo Video
+
+Watch the complete SkillGraph walkthrough, including the deployed application and its main functionality:
+
+▶️ **[Watch the SkillGraph Demo on Google Drive](https://drive.google.com/file/d/1JLse8BtWF5V_rDBSI-rtD7YXAdFbR12a/view?usp=sharing)**
+
+The demo covers the core user experience, including career exploration, skill exploration, skill-gap analysis, and learning-path functionality.
+
+---
+
 ## 🖥️ UI Screenshots
 
 The live application is available at **https://skillgraph-self.vercel.app/**.
