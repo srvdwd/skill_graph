@@ -204,7 +204,7 @@ against the production database before first use.
 
 ---
 
-## 9. Known simplifications (worth naming proactively in an interview)
+## 9. Known simplifications
 
 - No authentication layer — the `User` node and `HAS_SKILL` relationship are modeled in
   the schema, but the UI currently sends a user's selected skill IDs directly in the
