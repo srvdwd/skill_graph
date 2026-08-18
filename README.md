@@ -296,7 +296,6 @@ skillgraph/
 
 ## 💻 Run Locally
 
-<<<<<<< HEAD
 ### 🗄️ Create and Configure the CognoDB Instance
 
 SkillGraph uses **CognoDB** as its graph database through **openCypher over Bolt** and the official `neo4j` Python driver.
@@ -326,8 +325,6 @@ The seed script populates the careers, skills, resources, and graph relationship
 > **Security note:** Keep real credentials out of Git. Commit `.env.example`, not your production `.env`.
 
 
-=======
->>>>>>> ef3c76ef511f249bc979935119fd08275a65c943
 ### 1. Clone the repository
 
 ```bash
@@ -426,7 +423,6 @@ http://localhost:5173
 
 ---
 
-<<<<<<< HEAD
 ## 🖥️ UI Screenshots
 
 The live application is available at **https://skillgraph-self.vercel.app/**.
@@ -459,8 +455,6 @@ Discover prerequisite paths between skills to turn a skill gap into an actionabl
 
 ---
 
-=======
->>>>>>> ef3c76ef511f249bc979935119fd08275a65c943
 ## ☁️ Production Deployment
 
 ### Frontend — Vercel
@@ -600,6 +594,18 @@ Interactive API documentation:
 👉 https://skillgraph-0izb.onrender.com/docs
 
 ---
+
+## ✅ Assignment Requirements Coverage
+
+| Requirement | Covered |
+|---|---|
+| Use case | ✅ Career and skill relationship explorer + end-to-end user flow |
+| Why a graph database? | ✅ Graph-native explanation and examples |
+| Data model diagram | ✅ Nodes, relationships, and conceptual graph |
+| Setup and run instructions | ✅ Backend and frontend local setup |
+| Create the CognoDB instance | ✅ Dedicated CognoDB setup section |
+| Main queries explained | ✅ Skill-gap, learning-path, and related-career Cypher |
+| UI screenshots | ✅ Dedicated screenshot section |
 
 ## 🗺️ Future Roadmap
 
