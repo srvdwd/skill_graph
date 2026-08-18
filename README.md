@@ -143,7 +143,7 @@ endpoints uses parameters (`$param`), never string concatenation.
 
 ---
 
-## 6. Notable queries (interview talking points)
+## 6. Notable queries
 
 **Skill-gap analysis (`analysis_queries.find_missing_skills`)** — a set-difference:
 skills a career `REQUIRES` minus the skills the user already has.
@@ -204,7 +204,7 @@ against the production database before first use.
 
 ---
 
-## 9. Known simplifications (worth naming proactively in an interview)
+## 9. Known simplifications
 
 - No authentication layer — the `User` node and `HAS_SKILL` relationship are modeled in
   the schema, but the UI currently sends a user's selected skill IDs directly in the

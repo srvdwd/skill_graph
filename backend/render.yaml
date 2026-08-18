@@ -1,6 +1,4 @@
-# Render.com deployment config (Blueprint). If deploying to Railway
-# instead, these same values (build/start commands, env vars) are set
-# manually in the Railway dashboard - Railway does not read this file.
+
 services:
   - type: web
     name: skillgraph-api

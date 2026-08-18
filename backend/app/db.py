@@ -1,12 +1,3 @@
-"""
-Owns the lifecycle of the single Neo4j driver instance used to talk to
-CognoDB over Bolt. Created once at app startup, reused for every
-request, closed once at shutdown.
-
-No other module should import `neo4j` directly for connection purposes -
-everything goes through get_session() below. That is what makes
-"handle database connection failures gracefully" a one-place concern.
-"""
 
 import logging
 from typing import Generator
@@ -22,7 +13,7 @@ _driver: Driver | None = None
 
 
 def init_driver() -> None:
-    """Create the driver once, at FastAPI startup."""
+
     global _driver
     settings = get_settings()
     _driver = GraphDatabase.driver(
@@ -33,7 +24,7 @@ def init_driver() -> None:
 
 
 def close_driver() -> None:
-    """Close the driver once, at FastAPI shutdown."""
+
     global _driver
     if _driver is not None:
         _driver.close()
@@ -42,12 +33,7 @@ def close_driver() -> None:
 
 
 def verify_connectivity() -> tuple[bool, str | None]:
-    """
-    Actively checks that CognoDB is reachable and credentials are valid.
-    Returns (is_healthy, error_message).
-    Used by /api/health and at startup so failures surface immediately
-    instead of on the first user request.
-    """
+
     if _driver is None:
         return False, "Driver not initialized"
     try:
@@ -65,11 +51,7 @@ def verify_connectivity() -> tuple[bool, str | None]:
 
 
 def get_session() -> Generator:
-    """
-    FastAPI dependency. Yields a Neo4j session scoped to the configured
-    database, and always closes it - even if the request raised.
-    Routers/services never construct sessions themselves.
-    """
+
     if _driver is None:
         raise ServiceUnavailable("Database driver is not initialized")
 

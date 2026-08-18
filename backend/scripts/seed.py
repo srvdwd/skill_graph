@@ -1,12 +1,3 @@
-"""
-Idempotent seed script for SkillGraph.
-
-Run with:  python scripts/seed.py   (from the backend/ directory)
-
-Uses MERGE (not CREATE) for every node and relationship, so running
-this script multiple times never produces duplicates. All data is
-inserted with parameterized Cypher via UNWIND, not string concatenation.
-"""
 
 import logging
 import sys
@@ -20,9 +11,6 @@ from app.config import get_settings
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("skillgraph.seed")
 
-# ---------------------------------------------------------------------------
-# Data
-# ---------------------------------------------------------------------------
 
 CAREERS = [
     {"id": "career_data_analyst", "title": "Data Analyst",
@@ -158,8 +146,6 @@ CAREER_REQUIRES_SKILL = [
 ]
 
 # Skill -[:PREREQUISITE_FOR]-> Skill  (directed, ordering relationship)
-# Designed to form clear multi-hop chains, e.g.
-# Python -> Machine Learning -> Deep Learning -> NLP -> LLM Applications
 SKILL_PREREQUISITE_FOR = [
     ("skill_python", "skill_pandas"),
     ("skill_python", "skill_machine_learning"),
