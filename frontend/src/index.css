@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-ink-950 text-mist-100 font-body antialiased;
+  background-image: radial-gradient(circle at 15% 0%, rgba(140, 126, 242, 0.08), transparent 45%),
+    radial-gradient(circle at 85% 10%, rgba(55, 214, 184, 0.06), transparent 45%);
+  background-attachment: fixed;
+}
+
+h1, h2, h3, h4 {
+  @apply font-display;
+}
+
+::selection {
+  background: rgba(55, 214, 184, 0.25);
+}
+
+:focus-visible {
+  outline: 2px solid #37D6B8;
+  outline-offset: 2px;
+}
