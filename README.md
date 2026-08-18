@@ -296,6 +296,35 @@ skillgraph/
 
 ## 💻 Run Locally
 
+### 🗄️ Create and Configure the CognoDB Instance
+
+SkillGraph uses **CognoDB** as its graph database through **openCypher over Bolt** and the official `neo4j` Python driver.
+
+1. Create or sign in to your CognoDB account.
+2. Create a new **database instance** for the SkillGraph project.
+3. Obtain the instance's **Bolt connection URI** and database credentials.
+4. Configure the backend environment file:
+
+```env
+NEO4J_URI=<your-cognodb-bolt-uri>
+NEO4J_USER=<your-cognodb-username>
+NEO4J_PASSWORD=<your-cognodb-password>
+NEO4J_DATABASE=<your-cognodb-database-name>
+```
+
+5. Make sure the database instance is running and reachable from the backend environment.
+6. Seed the graph:
+
+```bash
+cd backend
+python scripts/seed.py
+```
+
+The seed script populates the careers, skills, resources, and graph relationships used by the application.
+
+> **Security note:** Keep real credentials out of Git. Commit `.env.example`, not your production `.env`.
+
+
 ### 1. Clone the repository
 
 ```bash
@@ -391,6 +420,38 @@ Frontend:
 ```text
 http://localhost:5173
 ```
+
+---
+
+## 🖥️ UI Screenshots
+
+The live application is available at **https://skillgraph-self.vercel.app/**.
+
+Place the actual screenshots in `docs/screenshots/` using these filenames so GitHub renders them automatically.
+
+### 🌐 Career Explorer
+
+![SkillGraph Career Explorer](docs/screenshots/career-explorer.png)
+
+Explore available career roles and inspect the skills required by each role.
+
+### 🕸️ Skill Explorer / Relationship Graph
+
+![SkillGraph Skill Explorer](docs/screenshots/skill-explorer.png)
+
+Explore skills and their prerequisite and related-skill relationships.
+
+### 📊 Skill Gap Analysis
+
+![SkillGraph Skill Gap Analysis](docs/screenshots/skill-gap-analysis.png)
+
+Select your existing skills, choose a target career, and view the missing skills and learning resources.
+
+### 🧭 Learning Path
+
+![SkillGraph Learning Path](docs/screenshots/learning-path.png)
+
+Discover prerequisite paths between skills to turn a skill gap into an actionable learning sequence.
 
 ---
 

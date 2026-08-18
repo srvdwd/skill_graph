@@ -1,0 +1,309 @@
+I am completing a 48-hour take-home internship assignment.
+
+I need to build a complete web application backed by CognoDB, a managed graph database that supports openCypher over the Bolt protocol and works with the official Neo4j drivers.
+
+My chosen project is:
+
+**SkillGraph — Interactive Career and Skill Relationship Explorer**
+
+The application should allow users to:
+
+1. Explore career roles.
+2. View the skills required for each career.
+3. Select their existing skills.
+4. Select a target career.
+5. Perform a skill-gap analysis.
+6. Discover missing skills.
+7. Explore prerequisite relationships between skills.
+8. Find multi-hop learning paths from one skill to another.
+9. View learning resources associated with missing skills.
+
+My planned stack is:
+
+* Frontend: React + Vite + Tailwind CSS
+* Backend: Python + FastAPI
+* Database: CognoDB
+* Database driver: Official Neo4j Python Driver
+* Deployment: Vercel for frontend and Render/Railway for backend
+
+Graph model:
+
+Nodes:
+
+* User
+* Skill
+* Career
+* Resource
+
+Relationships:
+
+* User -[:HAS_SKILL]-> Skill
+* Career -[:REQUIRES]-> Skill
+* Skill -[:RELATED_TO]-> Skill
+* Skill -[:PREREQUISITE_FOR]-> Skill
+* Resource -[:TEACHES]-> Skill
+
+Important assignment requirements:
+
+* Use parameterized Cypher queries only.
+* Never use string concatenation to build Cypher queries.
+* Store database URI, username and password in environment variables.
+* Include realistic seed data and a seed script.
+* Include at least one multi-hop traversal of two or more hops.
+* Include at least one graph query that would be awkward to model with a relational database.
+* Handle database connection failures gracefully.
+* Build a clean UI with loading, empty and error states.
+* Keep the architecture simple, maintainable and easy to explain in an interview.
+
+I do NOT want you to generate the entire project at once.
+
+Act as a senior software engineer and technical mentor.
+
+Guide me step by step.
+
+For every step:
+
+1. First explain what we are building and why.
+2. Tell me exactly which files to create or modify.
+3. Give me only the code necessary for that step.
+4. Explain every important part of the code.
+5. Tell me how to run and test it.
+6. Give me a checklist of expected results before moving forward.
+7. Do not move to the next step until I confirm that the current step works.
+8. Prefer simple and maintainable solutions over complex abstractions.
+9. Do not invent libraries, CognoDB APIs, or database features.
+10. If you are uncertain about a CognoDB-specific feature, clearly tell me instead of hallucinating.
+
+Project development order:
+
+Step 1: Project architecture and folder structure.
+Step 2: Set up CognoDB connection using the official Neo4j Python driver.
+Step 3: Create configuration and environment variable handling.
+Step 4: Design the graph schema and explain why each node and relationship exists.
+Step 5: Create constraints and indexes.
+Step 6: Build realistic seed data and an idempotent seed script using MERGE.
+Step 7: Verify the graph using Cypher queries.
+Step 8: Create FastAPI application structure.
+Step 9: Implement career exploration APIs.
+Step 10: Implement skill exploration APIs.
+Step 11: Implement skill gap analysis using parameterized Cypher.
+Step 12: Implement multi-hop learning path traversal.
+Step 13: Add graceful database error handling.
+Step 14: Test all APIs using FastAPI Swagger UI.
+Step 15: Build the React frontend.
+Step 16: Connect frontend to backend APIs.
+Step 17: Add loading, empty and error states.
+Step 18: Improve UI/UX and responsiveness.
+Step 19: Prepare deployment configuration.
+Step 20: Write README, graph diagram, screenshots and interview explanation.
+
+Start with Step 1 only.
+Let's begin Step 1.
+
+Based on the project requirements, design the simplest production-quality folder structure for:
+
+* React frontend
+* FastAPI backend
+* CognoDB graph database integration
+* Seed scripts
+* Configuration
+* API routers
+* Services
+* Pydantic schemas
+
+Do not generate the complete code yet.
+
+First:
+
+1. Show me the complete folder structure.
+2. Explain the responsibility of every important folder and file.
+3. Explain how a request flows from the React frontend to FastAPI and then to CognoDB.
+4. Identify which parts should contain Cypher queries.
+5. Keep the architecture simple enough for a student to explain during an internship interview.
+
+After that, wait for my confirmation.
+
+Before writing any code, explain the proposed architecture and wait for my confirmation.
+Now begin Step 2.
+
+Help me connect my FastAPI backend to CognoDB using the official Neo4j Python driver.
+
+Requirements:
+
+* Read database URI, username and password from environment variables.
+* Do not hardcode credentials.
+* Create a reusable database driver.
+* Add a connection verification function.
+* Add graceful error handling.
+* Create a simple test query.
+* Keep the implementation simple.
+
+Please provide:
+
+1. Files to create.
+2. Exact code.
+3. Explanation of each important section.
+4. Commands to install dependencies.
+5. Example .env file.
+6. Example .env.example file without secrets.
+7. How to test the connection.
+8. What output I should expect.
+
+Do not proceed to the next development step.Now help me implement the graph seed data.
+
+I want realistic but manageable data for:
+
+* 5 to 7 Career nodes
+* 25 to 40 Skill nodes
+* 10 to 20 Resource nodes
+
+Relationships:
+
+* Career REQUIRES Skill
+* Skill RELATED_TO Skill
+* Skill PREREQUISITE_FOR Skill
+* Resource TEACHES Skill
+
+Requirements:
+
+* Use the official Neo4j Python driver.
+* Use parameterized Cypher queries.
+* Use MERGE so the seed script is idempotent.
+* Do not create duplicate nodes or relationships when the script is run multiple times.
+* Create constraints before inserting data where appropriate.
+* Organize the data in Python dictionaries/lists so it is easy to understand.
+* Make sure the relationships form meaningful multi-hop learning paths.
+
+For example:
+
+Python
+→ Machine Learning
+→ Deep Learning
+→ LLM Applications
+
+Before writing code, first show me the proposed dataset and relationships.
+
+Then wait for my confirmation.
+Now help me design the most important Cypher queries for this project.
+
+I need queries for:
+
+1. Get all careers.
+2. Get career details and required skills.
+3. Get all skills.
+4. Perform skill-gap analysis.
+5. Find learning resources for missing skills.
+6. Find a multi-hop prerequisite path between skills.
+7. Find skills indirectly connected to a career through prerequisite chains.
+8. Find related careers based on shared skills.
+
+For every query:
+
+* Use parameters.
+* Explain the graph traversal.
+* Explain why the query is useful.
+* Show an example input.
+* Show an example output.
+* Explain whether this query demonstrates an advantage of graph databases.
+
+Do not write the FastAPI endpoints yet.
+Now implement the FastAPI backend APIs based on the approved graph model and Cypher queries.
+
+I want these endpoints:
+
+GET /api/careers
+
+GET /api/careers/{career_id}
+
+GET /api/skills
+
+POST /api/skill-gap
+
+GET /api/learning-path
+
+GET /api/health
+
+Requirements:
+
+* Use Pydantic request and response models.
+* Keep database access separate from routers.
+* Use parameterized Cypher queries.
+* Add proper HTTP status codes.
+* Add graceful handling when CognoDB is unavailable.
+* Keep the code simple and easy to explain.
+
+For each endpoint:
+
+1. Explain its purpose.
+2. Show the files to modify.
+3. Provide the code.
+4. Show an example request.
+5. Show an example response.
+6. Tell me how to test it in Swagger UI.
+
+Only implement the backend. Do not start the frontend yet.Now help me build the React frontend.
+
+The application should feel polished and simple enough for a non-technical person.
+
+Main features:
+
+1. Navigation bar.
+2. Hero section explaining SkillGraph.
+3. Career explorer.
+4. Career cards.
+5. Skill selection component.
+6. Target career selection.
+7. Skill gap analysis results.
+8. Learning path visualization.
+9. Loading state.
+10. Empty state.
+11. Error state.
+
+Use:
+
+* React
+* Vite
+* Tailwind CSS
+
+Requirements:
+
+* Do not over-engineer.
+* Create reusable components only where useful.
+* Use a clean modern layout.
+* Make the most important feature, Skill Gap Analysis, visually prominent.
+* Keep API calls in a separate service file.
+* Handle loading and API errors properly.
+* Make the UI responsive.
+
+First show me the proposed component structure and page layout.
+
+Wait for my approval before generating all component code.Act as a senior product designer reviewing my SkillGraph application.
+
+I will provide screenshots or code.
+
+Evaluate:
+
+* Visual hierarchy
+* Spacing
+* Typography
+* Color consistency
+* Navigation
+* Form usability
+* Loading states
+* Empty states
+* Error states
+* Whether a non-technical user can understand the application
+* Whether the graph database features are clearly visible
+
+Give me a prioritized list:
+
+P0 — Must fix before submission
+P1 — Important improvement
+P2 — Nice to have
+
+For every recommendation, explain the expected user experience improvement.
+
+Do not suggest unnecessary animations or overly complex redesigns.
+
+
+
