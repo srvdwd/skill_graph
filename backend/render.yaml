@@ -1,0 +1,20 @@
+# Render.com deployment config (Blueprint). If deploying to Railway
+# instead, these same values (build/start commands, env vars) are set
+# manually in the Railway dashboard - Railway does not read this file.
+services:
+  - type: web
+    name: skillgraph-api
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: NEO4J_URI
+        sync: false
+      - key: NEO4J_USER
+        sync: false
+      - key: NEO4J_PASSWORD
+        sync: false
+      - key: NEO4J_DATABASE
+        value: neo4j
+      - key: ALLOWED_ORIGINS
+        sync: false
